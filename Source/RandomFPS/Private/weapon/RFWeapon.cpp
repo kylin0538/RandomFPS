@@ -5,6 +5,7 @@
 #include "Components/SphereComponent.h"
 #include "Components/WidgetComponent.h"
 #include "RandomFPS/RandomFPSCharacter.h"
+#include "Net/UnrealNetwork.h"
 
 
 // Sets default values
@@ -49,6 +50,13 @@ void ARFWeapon::BeginPlay()
 	}
 }
 
+void ARFWeapon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ARFWeapon, WeaponState);
+}
+
 void ARFWeapon::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	ARandomFPSCharacter* RFCharacter = Cast<ARandomFPSCharacter>(OtherActor);
@@ -79,6 +87,34 @@ void ARFWeapon::ShowPickUpTipWidget(bool bVisible) const
 	if (PickUpTip)
 	{
 		PickUpTip->SetVisibility(bVisible);
+	}
+}
+
+void ARFWeapon::SetWeaponState(EWeaponState state)
+{
+	WeaponState = state;
+	WeaponStateUpdate();
+}
+
+void ARFWeapon::OnRep_WeaponStateChange()
+{
+	WeaponStateUpdate();
+}
+
+void ARFWeapon::WeaponStateUpdate()
+{
+	switch (WeaponState)
+	{
+	case EWeaponState::EWS_Equipped:
+		ShowPickUpTipWidget(false);
+		AreaSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		break;
+	case EWeaponState::EWS_Dropped:
+		break;
+	case EWeaponState::EWS_MAX:
+		break;
+	default:
+		break;
 	}
 }
 

@@ -30,7 +30,7 @@ public:
 	UPROPERTY(VisibleAnywhere, Category = "Weapon Property")
 		class USphereComponent* AreaSphere;
 
-	UPROPERTY(VisibleAnywhere, Category = "Weapon Property")
+	UPROPERTY(ReplicatedUsing = OnRep_WeaponStateChange,VisibleAnywhere, Category = "Weapon Property")
 	EWeaponState WeaponState;
 
 	UPROPERTY(VisibleAnywhere, Category = "Weapon Property")
@@ -38,6 +38,8 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	UFUNCTION()
 	virtual void OnSphereOverlap(
@@ -62,4 +64,12 @@ public:
 
 	void ShowPickUpTipWidget(bool bVisible) const;
 
+	void SetWeaponState(EWeaponState state);
+
+private:
+
+	UFUNCTION()
+	void OnRep_WeaponStateChange();
+
+	void WeaponStateUpdate();
 };

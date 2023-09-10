@@ -10,6 +10,9 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include <Net/UnrealNetwork.h>
+#include "RFComponent/RFBattleComponent.h"
+#include "RFComponent/RFBattleSubComp.h"
+#include "weapon/RFWeapon.h"
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -49,8 +52,8 @@ ARandomFPSCharacter::ARandomFPSCharacter()
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
-	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
-	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
+	RFCombat = CreateDefaultSubobject<URFBattleSubComp>(TEXT("RFCombat"));
+	RFCombat->SetIsReplicated(true);
 }
 
 void ARandomFPSCharacter::BeginPlay()
@@ -73,6 +76,15 @@ void ARandomFPSCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& 
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME_CONDITION(ARandomFPSCharacter, RFWeapon, COND_OwnerOnly);
+}
+
+void ARandomFPSCharacter::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+	if (RFCombat)
+	{
+		RFCombat->SetCharacter(this);
+	}
 }
 
 void ARandomFPSCharacter::SetOverlappedWeapon(ARFWeapon* OverlapRFWeapon)
@@ -121,6 +133,8 @@ void ARandomFPSCharacter::SetupPlayerInputComponent(class UInputComponent* Playe
 		//Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ARandomFPSCharacter::Look);
 
+		EnhancedInputComponent->BindAction(EquipWeaponAction, ETriggerEvent::Triggered, this, &ARandomFPSCharacter::EquipWeapon);
+
 	}
 
 }
@@ -161,6 +175,24 @@ void ARandomFPSCharacter::Look(const FInputActionValue& Value)
 	}
 }
 
+void ARandomFPSCharacter::EquipWeapon(const FInputActionValue& Value)
+{
+	if (RFCombat)
+	{
+		if (HasAuthority())
+		{
+			RFCombat->EquipRFWeapon(RFWeapon);
+		}
+		else {
+			ServerRequestEquipWeapon();
+		}
+		
+	}
+}
 
+void ARandomFPSCharacter::ServerRequestEquipWeapon_Implementation()
+{
+	RFCombat->EquipRFWeapon(RFWeapon);
+}
 
 

@@ -5,9 +5,9 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "InputActionValue.h"
-#include "weapon/RFWeapon.h"
 #include "RandomFPSCharacter.generated.h"
 
+class ARFWeapon;
 
 UCLASS(config=Game)
 class ARandomFPSCharacter : public ACharacter
@@ -38,6 +38,15 @@ class ARandomFPSCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* LookAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputAction* EquipWeaponAction;
+
+	UPROPERTY(ReplicatedUsing = OnRep_WeaponChange)
+	class ARFWeapon* RFWeapon;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapon, meta = (AllowPrivateAccess = "true"))
+	class URFBattleSubComp* RFCombat;
+
 public:
 	ARandomFPSCharacter();
 	
@@ -49,7 +58,8 @@ protected:
 
 	/** Called for looking input */
 	void Look(const FInputActionValue& Value);
-			
+		
+	void EquipWeapon(const FInputActionValue& Value);
 
 protected:
 	// APawn interface
@@ -66,10 +76,11 @@ public:
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 
-private:
+	UFUNCTION(Server, Reliable)
+		void ServerRequestEquipWeapon();
 
-	UPROPERTY(ReplicatedUsing = OnRep_WeaponChange)
-		class ARFWeapon* RFWeapon;
+	virtual void PostInitializeComponents() override;
+private:
 
 	UFUNCTION()
 		void OnRep_WeaponChange(ARFWeapon* lastWeapon);
