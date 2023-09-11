@@ -10,7 +10,6 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include <Net/UnrealNetwork.h>
-#include "RFComponent/RFBattleComponent.h"
 #include "RFComponent/RFBattleSubComp.h"
 #include "weapon/RFWeapon.h"
 
@@ -54,6 +53,8 @@ ARandomFPSCharacter::ARandomFPSCharacter()
 
 	RFCombat = CreateDefaultSubobject<URFBattleSubComp>(TEXT("RFCombat"));
 	RFCombat->SetIsReplicated(true);
+
+	GetCharacterMovement()->NavAgentProps.bCanCrouch = true;
 }
 
 void ARandomFPSCharacter::BeginPlay()
@@ -85,6 +86,11 @@ void ARandomFPSCharacter::PostInitializeComponents()
 	{
 		RFCombat->SetCharacter(this);
 	}
+}
+
+bool ARandomFPSCharacter::IsWeaponEquiped()
+{
+	return RFCombat && RFCombat->EquippedWeapon;
 }
 
 void ARandomFPSCharacter::SetOverlappedWeapon(ARFWeapon* OverlapRFWeapon)
@@ -134,7 +140,7 @@ void ARandomFPSCharacter::SetupPlayerInputComponent(class UInputComponent* Playe
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ARandomFPSCharacter::Look);
 
 		EnhancedInputComponent->BindAction(EquipWeaponAction, ETriggerEvent::Triggered, this, &ARandomFPSCharacter::EquipWeapon);
-
+		EnhancedInputComponent->BindAction(CrouchAction, ETriggerEvent::Completed, this, &ARandomFPSCharacter::RFCrouch);
 	}
 
 }
@@ -187,6 +193,16 @@ void ARandomFPSCharacter::EquipWeapon(const FInputActionValue& Value)
 			ServerRequestEquipWeapon();
 		}
 		
+	}
+}
+
+void ARandomFPSCharacter::RFCrouch(const FInputActionValue& Value)
+{
+	if (bIsCrouched) {
+		UnCrouch();
+	}
+	else {
+		Crouch();
 	}
 }
 

@@ -41,6 +41,9 @@ class ARandomFPSCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* EquipWeaponAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputAction* CrouchAction;
+
 	UPROPERTY(ReplicatedUsing = OnRep_WeaponChange)
 	class ARFWeapon* RFWeapon;
 
@@ -49,8 +52,7 @@ class ARandomFPSCharacter : public ACharacter
 
 public:
 	ARandomFPSCharacter();
-	
-	void SetOverlappedWeapon(ARFWeapon* OverlapRFWeapon);
+	virtual void PostInitializeComponents() override;
 protected:
 
 	/** Called for movement input */
@@ -60,6 +62,8 @@ protected:
 	void Look(const FInputActionValue& Value);
 		
 	void EquipWeapon(const FInputActionValue& Value);
+
+	void RFCrouch(const FInputActionValue& Value);
 
 protected:
 	// APawn interface
@@ -79,7 +83,9 @@ public:
 	UFUNCTION(Server, Reliable)
 		void ServerRequestEquipWeapon();
 
-	virtual void PostInitializeComponents() override;
+	bool IsWeaponEquiped();
+
+	void SetOverlappedWeapon(ARFWeapon* OverlapRFWeapon);
 private:
 
 	UFUNCTION()

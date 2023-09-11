@@ -5,6 +5,7 @@
 #include "weapon/RFWeapon.h"
 #include "RandomFPS/RandomFPSCharacter.h"
 #include "Engine/SkeletalMeshSocket.h"
+#include "Net/UnrealNetwork.h"
 
 // Sets default values for this component's properties
 URFBattleSubComp::URFBattleSubComp()
@@ -24,6 +25,12 @@ void URFBattleSubComp::BeginPlay()
 
 	// ...
 	
+}
+
+void URFBattleSubComp::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(URFBattleSubComp, EquippedWeapon);
 }
 
 

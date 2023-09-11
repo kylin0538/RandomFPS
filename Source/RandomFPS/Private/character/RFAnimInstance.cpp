@@ -29,4 +29,6 @@ void URFAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	UCharacterMovementComponent* characterMovement = RFCharacter->GetCharacterMovement();
 	bIsInAir = characterMovement->IsFalling();
 	bIsAccelerating = characterMovement->GetCurrentAcceleration().Size() > 0.f ? true : false;
+	bIsEquipWeapon = RFCharacter->IsWeaponEquiped();
+	bIsCrouch = RFCharacter->bIsCrouched;
 }
