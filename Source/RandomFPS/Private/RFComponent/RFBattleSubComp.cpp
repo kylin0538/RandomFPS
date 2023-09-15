@@ -31,6 +31,7 @@ void URFBattleSubComp::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(URFBattleSubComp, EquippedWeapon);
+	DOREPLIFETIME(URFBattleSubComp, IsAniming);
 }
 
 
@@ -60,4 +61,9 @@ void URFBattleSubComp::EquipRFWeapon(ARFWeapon* WeaponToEquip)
 void URFBattleSubComp::SetCharacter(ARandomFPSCharacter* CharacterToSet)
 {
 	Character = CharacterToSet;
+}
+
+void URFBattleSubComp::SetIsAniming(bool isAnim)
+{
+	IsAniming = isAnim;
 }

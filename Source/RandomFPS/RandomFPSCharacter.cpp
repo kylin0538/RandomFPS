@@ -93,6 +93,11 @@ bool ARandomFPSCharacter::IsWeaponEquiped()
 	return RFCombat && RFCombat->EquippedWeapon;
 }
 
+bool ARandomFPSCharacter::IsPlayerAniming()
+{
+	return RFCombat && RFCombat->IsAniming;
+}
+
 void ARandomFPSCharacter::SetOverlappedWeapon(ARFWeapon* OverlapRFWeapon)
 {	
 	if (RFWeapon)
@@ -140,7 +145,10 @@ void ARandomFPSCharacter::SetupPlayerInputComponent(class UInputComponent* Playe
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ARandomFPSCharacter::Look);
 
 		EnhancedInputComponent->BindAction(EquipWeaponAction, ETriggerEvent::Triggered, this, &ARandomFPSCharacter::EquipWeapon);
-		EnhancedInputComponent->BindAction(CrouchAction, ETriggerEvent::Completed, this, &ARandomFPSCharacter::RFCrouch);
+		EnhancedInputComponent->BindAction(CrouchAction, ETriggerEvent::Started, this, &ARandomFPSCharacter::RFCrouch);
+
+		EnhancedInputComponent->BindAction(AnimAction, ETriggerEvent::Started, this, &ARandomFPSCharacter::AnimStart);
+		EnhancedInputComponent->BindAction(AnimAction, ETriggerEvent::Completed, this, &ARandomFPSCharacter::AnimComplete);
 	}
 
 }
@@ -206,9 +214,30 @@ void ARandomFPSCharacter::RFCrouch(const FInputActionValue& Value)
 	}
 }
 
+void ARandomFPSCharacter::AnimStart(const FInputActionValue& Value)
+{
+	if (IsWeaponEquiped())
+	{
+		RFCombat->SetIsAniming(true);
+		ServerRequestChangeIsAnim(true);
+	}
+}
+
+void ARandomFPSCharacter::AnimComplete(const FInputActionValue& Value)
+{
+	if (IsWeaponEquiped())
+	{
+		RFCombat->SetIsAniming(false);
+		ServerRequestChangeIsAnim(false);
+	}
+}
+
 void ARandomFPSCharacter::ServerRequestEquipWeapon_Implementation()
 {
 	RFCombat->EquipRFWeapon(RFWeapon);
 }
 
-
+void ARandomFPSCharacter::ServerRequestChangeIsAnim_Implementation(bool isAnim)
+{
+	RFCombat->SetIsAniming(isAnim);
+}

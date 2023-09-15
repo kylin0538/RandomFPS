@@ -31,4 +31,5 @@ void URFAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	bIsAccelerating = characterMovement->GetCurrentAcceleration().Size() > 0.f ? true : false;
 	bIsEquipWeapon = RFCharacter->IsWeaponEquiped();
 	bIsCrouch = RFCharacter->bIsCrouched;
+	bIsAnim = RFCharacter->IsPlayerAniming();
 }

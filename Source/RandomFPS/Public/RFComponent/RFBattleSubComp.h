@@ -25,10 +25,14 @@ protected:
 public:
 	void EquipRFWeapon(class ARFWeapon* WeaponToEquip);
 	void SetCharacter(class ARandomFPSCharacter* CharacterToSet);
+	void SetIsAniming(bool isAnim);
 private:
 	class ARandomFPSCharacter* Character;
 
 	UPROPERTY(Replicated)
 	class ARFWeapon* EquippedWeapon;
+
+	UPROPERTY(Replicated)
+	bool IsAniming{false};
 		
 };
