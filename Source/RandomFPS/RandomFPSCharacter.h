@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Character.h"
+#include "character/RFCharacterBase.h"
 #include "InputActionValue.h"
 #include "RandomFPSCharacter.generated.h"
 
 class ARFWeapon;
 
 UCLASS(config=Game)
-class ARandomFPSCharacter : public ACharacter
+class ARandomFPSCharacter : public ARFCharacterBase
 {
 	GENERATED_BODY()
 
